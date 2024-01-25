@@ -14,6 +14,7 @@ io.on('connection', socket => {
 
   socket.on('message', param => {
     io.emit('message', param);
+    io.emit('scrollToBottom');
   });
 
   socket.on('disconnect', () => {

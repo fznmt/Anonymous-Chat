@@ -33,7 +33,7 @@
               <input class="form-control" id="message">
             </div>
             <div class="col-4 mt-1">
-              <button class="btn btn-primary" id="sendMessage" type="submit">Kirim</button>
+              <button class="btn btn-primary" id="sendMessage">Kirim</button>
             </div>
           </div>
         </div>
@@ -50,13 +50,16 @@
     audio.play()
     socket.emit('join')
     socket.on('message', (param) => {
-      $('#message-list').append(`
+    $('#message-list').append(`
       <div class="card mt-1">
-          <div class="card-body">
-              ${param.text}
-          </div>
-      </div>`)
-    })
+        <div class="card-body">
+          ${param.text}
+        </div>
+      </div>`);
+	    
+    var messageList = document.getElementById('message-list');
+    messageList.scrollTop = messageList.scrollHeight;
+  });
     socket.on('userCount', (userCount) => {
       $('#onlineUserCount').text(userCount)
     })
@@ -65,6 +68,23 @@
         text: $('#message').val()
       })
     })
+
+	  $('#message').keypress((e) => {
+    if (e.which === 13 && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+  $('#sendMessage').click(() => {
+    sendMessage();
+  });
+
+  function sendMessage() {
+    socket.emit('message', {
+      text: $('#message').val()
+    });
+    $('#message').val('');
+  }
   </script>
  </body>
 </html>

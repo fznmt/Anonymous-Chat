@@ -51,15 +51,18 @@
   socket.emit('join')
 
   socket.on('message', (param) => {
+    var timestamp = new Date(param.timestamp);
+    var formattedTime = timestamp.toLocaleTimeString();
+
     $('#message-list').append(`
       <div class="card mt-1">
         <div class="card-body">
-          ${param.text}
+          <p><strong>${formattedTime}</strong>: ${param.text}</p>
         </div>
       </div>`);
+
     var messageList = document.getElementById('message-list');
     messageList.scrollTop = messageList.scrollHeight;
-
     socket.emit('newMessage');
   });
 
@@ -79,11 +82,14 @@
   });
 
   function sendMessage() {
+    var currentTime = new Date().toISOString();
     socket.emit('message', {
-      text: $('#message').val()
+      text: $('#message').val(),
+      timestamp: currentTime
     });
     $('#message').val('');
   }
+
   socket.on('scrollToBottom', () => {
     var messageList = document.getElementById('message-list');
     messageList.scrollTop = messageList.scrollHeight;

@@ -45,38 +45,37 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
   <script>
-    var socket = io()
-    var audio = new Audio('join.mp3')
-    audio.play()
-    socket.emit('join')
-    socket.on('message', (param) => {
+  var socket = io();
+  var audio = new Audio('join.mp3')
+  audio.play()
+  socket.emit('join')
+
+  socket.on('message', (param) => {
     $('#message-list').append(`
       <div class="card mt-1">
         <div class="card-body">
           ${param.text}
         </div>
       </div>`);
-	    
     var messageList = document.getElementById('message-list');
     messageList.scrollTop = messageList.scrollHeight;
-  });
-    socket.on('userCount', (userCount) => {
-      $('#onlineUserCount').text(userCount)
-    })
-    $('#sendMessage').click(() => {
-      socket.emit('message', {
-        text: $('#message').val()
-      })
-    })
 
-	  $('#message').keypress((e) => {
+    socket.emit('newMessage');
+  });
+
+  socket.on('userCount', (userCount) => {
+    $('#onlineUserCount').text(userCount);
+  });
+
+  $('#sendMessage').click(() => {
+    sendMessage();
+  });
+
+  $('#message').keypress((e) => {
     if (e.which === 13 && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
-  });
-  $('#sendMessage').click(() => {
-    sendMessage();
   });
 
   function sendMessage() {
@@ -85,6 +84,10 @@
     });
     $('#message').val('');
   }
-  </script>
+  socket.on('scrollToBottom', () => {
+    var messageList = document.getElementById('message-list');
+    messageList.scrollTop = messageList.scrollHeight;
+  });
+</script>
  </body>
 </html>

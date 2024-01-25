@@ -2,25 +2,25 @@ const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
-let userCount = 0;
+let connectedUsers = 0;
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
 io.on('connection', socket => {
-  socket.on('join', param => {
-    userCount++
-    io.emit('userCount', userCount)
-  })
+  connectedUsers++;
+  io.emit('userCount', connectedUsers);
+
   socket.on('message', param => {
-    io.emit('message', param)
-  })
-  socket.on('disconnect', param => {
-    userCount--
-    io.emit('userCount', userCount)
-  })
-})
+    io.emit('message', param);
+  });
+
+  socket.on('disconnect', () => {
+    connectedUsers = Math.max(0, connectedUsers - 1);
+    io.emit('userCount', connectedUsers);
+  });
+});
 
 http.listen(port, () => {
   console.log('[WEBSITE] Ready');

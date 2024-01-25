@@ -13,7 +13,9 @@ io.on('connection', socket => {
   io.emit('userCount', connectedUsers);
 
   socket.on('message', param => {
+    param.timestamp = new Date().toISOString();
     io.emit('message', param);
+
     io.emit('scrollToBottom');
   });
 
